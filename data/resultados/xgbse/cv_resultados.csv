@@ -1,0 +1,3 @@
+params,mean_test_score,std_test_score
+{'xgb_params__n_estimators': 50},0.7535630399957989,0.0047549794254883515
+{'xgb_params__n_estimators': 250},0.7535630399957989,0.0047549794254883515
