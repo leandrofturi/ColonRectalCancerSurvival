@@ -31,7 +31,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
         self.model: Optional[RandomSurvivalForest] = None
 
     def fit(self, X, y):
-        self.model = RandomSurvivalForest(**self.est_params, n_jobs=1)
+        self.model = RandomSurvivalForest(**self.est_params)
         self.model.fit(X, y)
         return self
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         param_grid=param_grid,
         scoring=None, # est.score (C-index)
         cv=cv,
-        n_jobs=-1,
+        n_jobs=1,
         refit=True,
         verbose=10
     )
