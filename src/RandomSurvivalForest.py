@@ -2,7 +2,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import os
-from typing import Optional
+from typing import Any, Dict, Optional
 import joblib
 import pandas as pd
 from sklearn.base import BaseEstimator, RegressorMixin
@@ -24,6 +24,8 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
     Wrapper sklearn-friendly para RandomSurvivalForest:
     """
     def __init__(self, **kwargs):
+        self.est_params: Dict[str, Any] = {}
+
         for k, v in kwargs.items():
             self.est_params[k] = v
         self.model: Optional[RandomSurvivalForest] = None
