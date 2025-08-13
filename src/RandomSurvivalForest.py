@@ -84,7 +84,7 @@ if __name__ == "__main__":
         param_grid=param_grid,
         scoring=None, # est.score (C-index)
         cv=cv,
-        n_jobs=1,
+        n_jobs=4,
         refit=True,
         verbose=10
     )
