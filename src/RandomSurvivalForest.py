@@ -35,7 +35,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
 
     def predict(self, X):
         """
-        Retorna a curva de sobrevivência (n_amostras x model.unique_times_).
+        Retorna a curva de sobrevivência (n_amostras x times).
         """
         return self.model.predict_survival_function(X, return_array=True)
 

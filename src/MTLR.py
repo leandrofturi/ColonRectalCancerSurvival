@@ -2,13 +2,13 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import os
-from typing import Optional
 import joblib
 import pandas as pd
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.model_selection import GridSearchCV, KFold
-from sksurv.ensemble import GradientBoostingSurvivalAnalysis
-from sksurv.util import Surv
+import torchtuples as tt
+from pycox.evaluation import EvalSurv
+from pycox.models import MTLR
 from .load_data import (
     X_train, X_test,
     y_train, y_test,
@@ -16,34 +16,56 @@ from .load_data import (
 ) 
 
 
-OUTPUT_DIR = "data/resultados/GradientBoostingSurvivalAnalysis"
+OUTPUT_DIR = "data/resultados/MTLR"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
     """
-    Wrapper sklearn-friendly para GradientBoostingSurvivalAnalysis:
+    Wrapper sklearn-friendly para MTLR:
     """
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             self.est_params[k] = v
-        self.model: Optional[GradientBoostingSurvivalAnalysis] = None
+        self.model = None
 
     def fit(self, X, y):
-        self.model = GradientBoostingSurvivalAnalysis(**self.est_params)
-        self.model.fit(X, y)
+        in_features = X.shape[1]
+        out_features = 1
+        batch_size = 256
+        epochs = 512
+        callbacks = [tt.callbacks.EarlyStopping()]
+
+        out_features = self.labtrans.out_features
+
+        num_durations = 100
+        self.labtrans = MTLR.label_transform(num_durations)
+        Y = self.labtrans.fit_transform(y[0], y[1])
+
+        net = tt.practical.MLPVanilla(in_features=in_features, 
+                                      out_features=out_features, 
+                                      **self.est_params)
+        self.model = MTLR(net, tt.optim.Adam, 
+                            duration_index=self.labtrans.cuts)
+        lrfinder = self.model.lr_finder(X, Y, batch_size, tolerance=10)
+        self.model.optimizer.set_lr(min(0.01, lrfinder.get_best_lr()))
+        self.model.fit(X, Y, 
+                       callbacks=callbacks, batch_size=batch_size, epochs=epochs, verbose=False)
         return self
 
     def predict(self, X):
         """
         Retorna a curva de sobrevivência (n_amostras x times).
         """
-        return self.model.predict_survival_function(X, return_array=True)
+        surv = self.model.interpolate(10).predict_surv_df(X)
+        return surv
 
     def score(self, X, y):
         """
         C-index score (quanto maior, melhor).
         """
-        return float(self.model.score(X, y))
+        surv = self.predict(X)
+        ev = EvalSurv(surv, y[0], y[1], censor_surv='km')
+        return float(ev.concordance_td())
 
     def get_params(self, deep=True):
         params = {}
@@ -60,22 +82,16 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
 
 
 if __name__ == "__main__":
-    Y_train = Surv.from_arrays(event_train, y_train, name_event="falha", name_time="time_years")
-    Y_test = Surv.from_arrays(event_test, y_test, name_event="falha", name_time="time_years")
+    Y_train = (y_train, event_train)
+    Y_test = (y_test, event_test)
 
     param_grid = {
-        "loss": ["coxph"], 
-        "learning_rate": [0.05, 0.1],
-        "n_estimators": [200, 400],
-        "subsample": [0.6, 1.0], 
-        "max_depth": [2, 3],
-        "min_samples_split": [2, 6],
-        "min_samples_leaf": [1, 3],
-        "max_features": ["sqrt", None],
-        "dropout_rate": [0.0], 
-        "ccp_alpha": [0.0],
+        "num_nodes": [[32, 32], [64, 32], [128, 64, 32]],
+        "batch_norm": [True, False],
+        "dropout": [None, 0.1],
+        "output_bias": [True, False],
     }
-    
+
     est = BaseEstimatorWrapper()
 
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
