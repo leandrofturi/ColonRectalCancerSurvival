@@ -51,7 +51,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
         """
         Retorna a curva de sobrevivência (n_amostras x n_time_bins).
         """
-        return self.model.predict(X, time_bins=self.time_bins)
+        return self.model.predict(X)
 
     def score(self, X, y):
         """

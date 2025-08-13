@@ -8,7 +8,7 @@ from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.model_selection import GridSearchCV, KFold
 import torchtuples as tt
 from pycox.evaluation import EvalSurv
-from pycox.models import LogisticHazard, BCESurv
+from pycox.models import LogisticHazard
 from .load_data import (
     X_train, X_test,
     y_train, y_test,
