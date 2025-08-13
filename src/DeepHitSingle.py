@@ -102,7 +102,7 @@ if __name__ == "__main__":
         cv=cv,
         n_jobs=-1,
         refit=True,
-        verbose=1
+        verbose=10
     )
 
     gcv.fit(X_train, Y_train)
