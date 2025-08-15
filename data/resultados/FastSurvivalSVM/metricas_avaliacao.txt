@@ -1,0 +1,10 @@
+Hiperparâmetros ótimos:
+{'alpha': 0.001}
+
+--- Métricas (C-index) ---
+C-index no conjunto de treino completo: 0.7597
+C-index no conjunto de teste: 0.7646
+
+--- Validação Cruzada ---
+Melhor C-index médio na CV: 0.7591
+Scores do melhor modelo em cada fold (CV): [0.7585, 0.7546, 0.7649, 0.7555, 0.7621]
