@@ -78,7 +78,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
 
     def get_params(self, deep=True):
         params = {}
-        params.update({f"model__lr": self.lr})
+        params["model__lr"] = self.lr
         params.update({f"model__{k}": v for k, v in self.model_params.items()})
         params.update(self.est_params)
         return params
