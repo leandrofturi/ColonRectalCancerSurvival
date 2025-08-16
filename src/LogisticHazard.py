@@ -125,6 +125,16 @@ if __name__ == "__main__":
 
     best_model = gcv.best_estimator_
 
+    # Remover callbacks/histórico do objeto pycox/torchtuples
+    m = getattr(best_model, "model", None)
+    if m is not None:
+        for attr in ["callbacks", "log", "cb", "_callbacks"]:
+            if hasattr(m, attr):
+                try:
+                    setattr(m, attr, [])
+                except Exception:
+                    pass
+
     # Salvar modelo
     best_model = gcv.best_estimator_
     joblib.dump(best_model, f"{OUTPUT_DIR}/melhor_modelo.pkl")
