@@ -84,6 +84,9 @@ if __name__ == "__main__":
     Y_train = np.column_stack([y_train, event_train])
     Y_test = np.column_stack([y_test, event_test])
 
+    print(len(Y_train))
+    print(len(X_train))
+
     param_grid = {
         "num_nodes": [[32, 32], [64, 32], [128, 64, 32]],
         "batch_norm": [True, False],
