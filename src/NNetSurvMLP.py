@@ -10,7 +10,7 @@ import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.base import BaseEstimator
 from sklearn.model_selection import GridSearchCV, KFold
-from load_data import (
+from .load_data import (
     X_train, X_test,
     y_train, y_test,
     event_train, event_test, 
