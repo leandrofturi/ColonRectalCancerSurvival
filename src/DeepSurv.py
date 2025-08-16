@@ -40,8 +40,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
                                       out_features=out_features, 
                                       **self.est_params)
         self.model = CoxPH(net, tt.optim.Adam)
-        lrfinder = self.model.lr_finder(X, y, batch_size, tolerance=10)
-        self.model.optimizer.set_lr(min(0.01, lrfinder.get_best_lr()))
+        self.model.optimizer.set_lr(0.01)
         self.model.fit(X, y, 
                        callbacks=callbacks, batch_size=batch_size, epochs=epochs, verbose=False)
         return self

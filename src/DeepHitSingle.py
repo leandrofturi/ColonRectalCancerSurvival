@@ -47,8 +47,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
                                       **self.est_params)
         self.model = DeepHitSingle(net, tt.optim.Adam, 
                                    duration_index=self.labtrans.cuts)
-        lrfinder = self.model.lr_finder(X, Y, batch_size, tolerance=10)
-        self.model.optimizer.set_lr(min(0.01, lrfinder.get_best_lr()))
+        self.model.optimizer.set_lr(0.01)
         self.model.fit(X, Y, 
                        callbacks=callbacks, batch_size=batch_size, epochs=epochs, verbose=False)
         return self
