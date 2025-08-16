@@ -3,6 +3,7 @@ warnings.filterwarnings("ignore")
 
 import os
 import joblib
+import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.model_selection import GridSearchCV, KFold
@@ -40,7 +41,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
 
         num_durations = 100
         self.labtrans = MTLR.label_transform(num_durations)
-        Y = self.labtrans.fit_transform(y[0], y[1])
+        Y = self.labtrans.fit_transform(y[:, 0].astype(np.float32), y[:, 1].astype(np.float32))
 
         net = tt.practical.MLPVanilla(in_features=in_features, 
                                       out_features=out_features, 
@@ -64,7 +65,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
         C-index score (quanto maior, melhor).
         """
         surv = self.predict(X)
-        ev = EvalSurv(surv, y[0], y[1], censor_surv='km')
+        ev = EvalSurv(surv, y[:, 0].astype(np.float32), y[:, 1].astype(np.float32), censor_surv='km')
         return float(ev.concordance_td())
 
     def get_params(self, deep=True):
@@ -82,8 +83,8 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
 
 
 if __name__ == "__main__":
-    Y_train = (y_train, event_train)
-    Y_test = (y_test, event_test)
+    Y_train = np.column_stack([y_train, event_train])
+    Y_test = np.column_stack([y_test, event_test])
 
     param_grid = {
         "num_nodes": [[32, 32], [64, 32], [128, 64, 32]],

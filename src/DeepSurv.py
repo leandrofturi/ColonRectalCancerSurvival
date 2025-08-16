@@ -84,9 +84,6 @@ if __name__ == "__main__":
     Y_train = np.column_stack([y_train, event_train])
     Y_test = np.column_stack([y_test, event_test])
 
-    print(len(Y_train))
-    print(len(X_train))
-
     param_grid = {
         "num_nodes": [[32, 32], [64, 32], [128, 64, 32]],
         "batch_norm": [True, False],
@@ -126,6 +123,18 @@ if __name__ == "__main__":
         fold_scores.append(cv_results.loc[best_index, f"split{i}_test_score"])
 
     best_model = gcv.best_estimator_
+
+    best = gcv.best_estimator_
+
+    # Remover callbacks/histórico do objeto pycox/torchtuples
+    m = getattr(best, "model", None)
+    if m is not None:
+        for attr in ["callbacks", "log", "cb", "_callbacks"]:
+            if hasattr(m, attr):
+                try:
+                    setattr(m, attr, [])
+                except Exception:
+                    pass
 
     # Salvar modelo
     best_model = gcv.best_estimator_
