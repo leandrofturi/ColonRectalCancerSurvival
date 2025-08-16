@@ -25,6 +25,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
     Wrapper sklearn-friendly para LogisticHazard:
     """
     def __init__(self, **kwargs):
+        self.est_params = {}
         for k, v in kwargs.items():
             self.est_params[k] = v
         self.model = None
