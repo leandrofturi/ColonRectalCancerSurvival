@@ -24,6 +24,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
     Wrapper sklearn-friendly para DeepSurv:
     """
     def __init__(self, **kwargs):
+        self.est_params = {}
         for k, v in kwargs.items():
             self.est_params[k] = v
         self.model = None

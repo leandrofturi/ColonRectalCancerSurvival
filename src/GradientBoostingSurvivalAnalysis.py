@@ -24,6 +24,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
     Wrapper sklearn-friendly para GradientBoostingSurvivalAnalysis:
     """
     def __init__(self, **kwargs):
+        self.est_params = {}
         for k, v in kwargs.items():
             self.est_params[k] = v
         self.model: Optional[GradientBoostingSurvivalAnalysis] = None
