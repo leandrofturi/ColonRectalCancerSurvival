@@ -27,11 +27,10 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
     def __init__(self, **kwargs):
         self.est_params = {}
         self.model_params = {}
-        
+        self.lr = None
+
         for k, v in kwargs.items():
-            if k == "model__lr":
-                self.lr = v
-            elif k.startswith("model__"):
+            if k.startswith("model__"):
                 self.model_params[k.replace("model__", "")] = v
             else:
                 self.est_params[k] = v
@@ -78,7 +77,7 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
 
     def get_params(self, deep=True):
         params = {}
-        params.update({f"model__lr": self.lr})
+        params["model__lr"] = self.lr
         params.update({f"model__{k}": v for k, v in self.model_params.items()})
         params.update(self.est_params)
         return params
