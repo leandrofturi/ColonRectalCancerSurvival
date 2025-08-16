@@ -44,7 +44,7 @@ if __name__ == "__main__":
         cv=cv,
         n_jobs=-1,      
         refit=True,     # Treina o melhor modelo com todos os dados no final
-        verbose=3       # Mostra o progresso do treinamento
+        verbose=10       # Mostra o progresso do treinamento
     )
 
     print("Iniciando a busca de hiperparâmetros para FastSurvivalSVM...")
