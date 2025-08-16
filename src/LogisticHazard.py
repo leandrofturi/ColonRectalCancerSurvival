@@ -26,8 +26,20 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
     """
     def __init__(self, **kwargs):
         self.est_params = {}
+        self.model_params = {}
+        
         for k, v in kwargs.items():
-            self.est_params[k] = v
+            if k.startswith("model__"):
+                self.model_params[k.replace("model__", "")] = v
+                lr = 0.01
+            else:
+                self.est_params[k] = v
+        
+        self.lr = 0.01
+        if 'lr' in self.model_params:
+            self.lr = self.model_params['lr']
+            del self.model_params['lr']
+        
         self.model = None
 
     def fit(self, X, y):
@@ -47,8 +59,9 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
                                       out_features=out_features, 
                                       **self.est_params)
         self.model = LogisticHazard(net, tt.optim.Adam, 
-                            duration_index=self.labtrans.cuts)
-        self.model.optimizer.set_lr(0.01)
+                            duration_index=self.labtrans.cuts,
+                            **self.model_params)
+        self.model.optimizer.set_lr(self.lr)
         self.model.fit(X, Y, 
                        callbacks=callbacks, batch_size=batch_size, epochs=epochs, verbose=False)
         return self
@@ -91,6 +104,7 @@ if __name__ == "__main__":
         "batch_norm": [True, False],
         "dropout": [None, 0.1],
         "output_bias": [True, False],
+        "model__lr": [0.01, 0.001, 0.0005],
     }
 
     est = BaseEstimatorWrapper()
