@@ -14,7 +14,7 @@ from sksurv.kernels import clinical_kernel
 from sksurv.svm import FastKernelSurvivalSVM
 from sksurv.util import Surv
 
-from load_data import (
+from .load_data import (
     X_train, X_test,
     y_train, y_test,
     event_train, event_test,
