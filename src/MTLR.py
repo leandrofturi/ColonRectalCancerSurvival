@@ -37,12 +37,12 @@ class BaseEstimatorWrapper(BaseEstimator, RegressorMixin):
         epochs = 512
         callbacks = [tt.callbacks.EarlyStopping()]
 
-        out_features = self.labtrans.out_features
-
         num_durations = 100
         self.labtrans = MTLR.label_transform(num_durations)
         Y = self.labtrans.fit_transform(y[:, 0].astype(np.float32), y[:, 1].astype(np.float32))
 
+        out_features = self.labtrans.out_features
+        
         net = tt.practical.MLPVanilla(in_features=in_features, 
                                       out_features=out_features, 
                                       **self.est_params)
